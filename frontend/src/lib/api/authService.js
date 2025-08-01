@@ -364,7 +364,9 @@
 import axios from "axios";
 
 // Base API URL for local server
-const BASE_URL = "http://localhost:7777/api/auth";
+// const BASE_URL = "http://localhost:7777/api/auth";
+const BASE_URL = "/api/auth";  // Works on both localhost and Vercel
+
 
 // Axios instance
 const api = axios.create({
