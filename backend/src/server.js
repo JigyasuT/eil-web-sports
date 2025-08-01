@@ -2,6 +2,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { default: serverless } = require('serverless-http');
+
+
 
 // const config = require('./config/config');
 require('dotenv').config();
@@ -172,7 +175,7 @@ const startServer = async () => {
 
 // Start the server
 startServer(); 
-
+module.exports.handler = serverless(app);
 
 
 
