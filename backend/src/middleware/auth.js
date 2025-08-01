@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const config = require('../config/config');
-
+// const config = require('../config/config');
+require('dotenv').config();
 // Protect routes
 exports.protect = async (req, res, next) => {
   let token;
-
   // Check for token in the Authorization header
   if (
     req.headers.authorization &&
@@ -14,7 +13,6 @@ exports.protect = async (req, res, next) => {
     // Extract token from Bearer token in header
     token = req.headers.authorization.split(' ')[1];
   }
-
   // Check if token exists
   if (!token) {
     return res.status(401).json({
@@ -22,10 +20,11 @@ exports.protect = async (req, res, next) => {
       message: 'Not authorized to access this route'
     });
   }
-
   try {
     // Verify token
-    const decoded = jwt.verify(token, config.JWT_SECRET);
+    // const decoded = jwt.verify(token, config.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
 
     // Find user from the decoded token and select necessary fields
     req.user = await User.findById(decoded.id).select('_id email name role');
@@ -36,7 +35,6 @@ exports.protect = async (req, res, next) => {
         message: 'User not found'
       });
     }
-
     // Log the user object for debugging
     console.log('User authenticated:', {
       id: req.user._id,
@@ -44,7 +42,6 @@ exports.protect = async (req, res, next) => {
       name: req.user.name,
       role: req.user.role
     });
-
     next();
   } catch (error) {
     console.error('Authentication error:', error.message);
@@ -54,7 +51,6 @@ exports.protect = async (req, res, next) => {
     });
   }
 };
-
 // Grant access to specific roles
 exports.authorize = (...roles) => {
   return (req, res, next) => {
@@ -64,7 +60,6 @@ exports.authorize = (...roles) => {
         message: 'Not authorized to access this route'
       });
     }
-    
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,

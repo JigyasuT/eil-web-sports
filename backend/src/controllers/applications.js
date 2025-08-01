@@ -6,6 +6,7 @@ const path = require('path');
 // @desc    Create new application
 // @route   POST /api/applications
 // @access  Private
+
 exports.createApplication = async (req, res, next) => {
   try {
     // Add user to req.body

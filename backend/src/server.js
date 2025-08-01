@@ -1,30 +1,53 @@
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+
+// const config = require('./config/config');
 require('dotenv').config();
-const config = require('./config/config');
+
 const errorHandler = require('./middleware/error');
 const { startMongoMemoryServer } = require('./setup-mongo-memory');
 const User = require('./models/User');
-
 // Route files
 const authRoutes = require('./routes/auth');
 const applicationRoutes = require('./routes/applications');
 const statusHistoryRoutes = require('./routes/statusHistory');
-
 // Initialize app
 const app = express();
-
 // Body parser
 app.use(express.json());
 
 // Enable CORS with more permissive settings for development
+// app.use(cors({
+//   origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:8081', 'http://localhost:8080','http://127.0.0.1:8081'],
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+
+
+const allowedOrigins = [
+  'http://localhost:8080',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
+];
+
 app.use(cors({
-  origin: ['https://sports-scholarship-eil-internship.vercel.app','http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:8081', 'http://localhost:8080','http://127.0.0.1:8081'],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+
 
 // Mount routers
 app.use('/api/auth', authRoutes);
@@ -102,10 +125,10 @@ const seedDefaultUsers = async () => {
 // Connect to MongoDB or MongoDB Memory Server
 const connectDB = async () => {
   try {
-    console.log(`Using memory DB? ${config.USE_MEMORY_DB ? 'Yes' : 'No'}`);
+    console.log(`Using memory DB? ${process.env.USE_MEMORY_DB ? 'Yes' : 'No'}`);
     
     // Check if we should use the in-memory database
-    if (config.USE_MEMORY_DB) {
+    if (process.env.USE_MEMORY_DB) {
       console.log('Initializing MongoDB Memory Server');
       const { mongoUri } = await startMongoMemoryServer();
       console.log(`MongoDB Memory Server URI: ${mongoUri}`);
@@ -114,8 +137,8 @@ const connectDB = async () => {
       await seedDefaultUsers();
     } else {
       // Connect to regular MongoDB instance
-      console.log(`Attempting to connect to MongoDB at: ${config.MONGODB_URI}`);
-      const conn = await mongoose.connect(config.MONGODB_URI);
+      console.log(`Attempting to connect to MongoDB at: ${process.env.MONGODB_URI}`);
+      const conn = await mongoose.connect(process.env.MONGODB_URI);
       console.log(`MongoDB Connected: ${conn.connection.host}`);
       
       // Also seed the regular database if needed
@@ -128,12 +151,13 @@ const connectDB = async () => {
   }
 };
 
+
 // Start server
 const startServer = async () => {
   // Connect to the database
   await connectDB();
   
-  const PORT = config.PORT;
+  const PORT = process.env.PORT;
   const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
@@ -148,3 +172,10 @@ const startServer = async () => {
 
 // Start the server
 startServer(); 
+
+
+
+
+
+
+

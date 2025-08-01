@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const StatusHistorySchema = new mongoose.Schema({
   applicationId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -41,10 +40,8 @@ const StatusHistorySchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
 // Add indexes for faster queries
 StatusHistorySchema.index({ applicationId: 1 });
 StatusHistorySchema.index({ newStatus: 1 });
 StatusHistorySchema.index({ timestamp: -1 });
-
 module.exports = mongoose.model('StatusHistory', StatusHistorySchema); 
