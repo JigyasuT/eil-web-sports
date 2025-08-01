@@ -1,5 +1,5 @@
 import { supabase } from "./supabase"; // your local client
-import type { User } from "@supabase/supabase-js";
+// import type { User } from "@supabase/supabase-js";
 
 export interface SignUpData {
   email: string;
