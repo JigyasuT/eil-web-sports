@@ -2,7 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const { default: serverless } = require('serverless-http');
+const serverless = require('serverless-http');
 
 
 
